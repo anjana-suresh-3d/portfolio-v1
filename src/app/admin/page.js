@@ -145,26 +145,47 @@ export default function AdminDashboard() {
         const file = e.target.files?.[0];
         if (!file) return;
         setUploading(true);
-        const formData = new FormData();
-        formData.append('file', file);
+
         try {
-            const res = await fetch('/api/upload', { method: 'POST', body: formData });
-            const data = await res.json();
-            if (res.ok && data.path) {
+            // 1. Get Signed Upload URL from our secure backend
+            const tokenRes = await fetch('/api/upload-token', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ filename: file.name, contentType: file.type })
+            });
+            const tokenData = await tokenRes.json();
+
+            if (!tokenRes.ok) {
+                alert(tokenData.error || 'Failed to authorize upload');
+                setUploading(false);
+                return;
+            }
+
+            // 2. Upload file directly from browser -> Supabase Storage (Bypasses Vercel 4.5MB limits/ISP DNS issues)
+            const uploadRes = await fetch(tokenData.uploadUrl, {
+                method: 'PUT',
+                body: file,
+                headers: {
+                    'Authorization': 'Bearer ' + tokenData.token,
+                    'Content-Type': file.type
+                }
+            });
+
+            if (uploadRes.ok) {
                 if (isGallery) {
                     setForm(prev => ({
                         ...prev,
-                        images: [...prev.images, { url: data.path, alt: '', description: '' }]
+                        images: [...prev.images, { url: tokenData.path, alt: '', description: '' }]
                     }));
-                    setPreviews(prev => ({ ...prev, [data.path]: data.url }));
+                    setPreviews(prev => ({ ...prev, [tokenData.path]: tokenData.previewUrl }));
                 } else if (isContent) {
-                    setContent(prev => ({ ...prev, [field]: data.url })); // Use signed URL for immediate content preview
+                    setContent(prev => ({ ...prev, [field]: tokenData.previewUrl }));
                 } else {
-                    setForm((prev) => ({ ...prev, [field]: data.path }));
-                    setPreviews(prev => ({ ...prev, [field]: data.url }));
+                    setForm((prev) => ({ ...prev, [field]: tokenData.path }));
+                    setPreviews(prev => ({ ...prev, [field]: tokenData.previewUrl }));
                 }
             } else {
-                alert(data.error || 'Upload failed');
+                alert('Direct upload to storage failed. Status: ' + uploadRes.status);
             }
         } catch (err) {
             console.error('Upload failed:', err);
