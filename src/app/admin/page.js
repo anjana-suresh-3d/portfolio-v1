@@ -172,17 +172,18 @@ export default function AdminDashboard() {
             });
 
             if (uploadRes.ok) {
+                const localPreview = URL.createObjectURL(file);
                 if (isGallery) {
                     setForm(prev => ({
                         ...prev,
                         images: [...prev.images, { url: tokenData.path, alt: '', description: '' }]
                     }));
-                    setPreviews(prev => ({ ...prev, [tokenData.path]: tokenData.previewUrl }));
+                    setPreviews(prev => ({ ...prev, [tokenData.path]: localPreview }));
                 } else if (isContent) {
-                    setContent(prev => ({ ...prev, [field]: tokenData.previewUrl }));
+                    setContent(prev => ({ ...prev, [field]: localPreview }));
                 } else {
                     setForm((prev) => ({ ...prev, [field]: tokenData.path }));
-                    setPreviews(prev => ({ ...prev, [field]: tokenData.previewUrl }));
+                    setPreviews(prev => ({ ...prev, [field]: localPreview }));
                 }
             } else {
                 alert('Direct upload to storage failed. Status: ' + uploadRes.status);
