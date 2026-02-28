@@ -5,7 +5,7 @@ import { useEffect, useState, useCallback } from 'react';
 import styles from './CursorShapes.module.css';
 
 const SHAPE_TYPES = ['square', 'circle', 'triangle'];
-const MAX_PARTICLES = 8;
+const MAX_PARTICLES = 1;
 
 export default function CursorShapes() {
     const [particles, setParticles] = useState([]);
