@@ -61,7 +61,11 @@ export default function ProjectGrid() {
                     <Link key={project.id} href={`/projects/${project.slug}`} className={styles.card}>
                         <div className={styles.imageWrapper}>
                             {project.coverImage ? (
-                                <img src={project.coverImage} alt={project.title} className={styles.image} />
+                                <img
+                                    src={project.coverImage.startsWith('http') ? `/_next/image?url=${encodeURIComponent(project.coverImage)}&w=1920&q=75` : project.coverImage}
+                                    alt={project.title}
+                                    className={styles.image}
+                                />
                             ) : (
                                 <div className={styles.placeholder}>{project.title.charAt(0)}</div>
                             )}

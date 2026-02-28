@@ -22,6 +22,7 @@ export default function HeroSection() {
                 </CanvasWrapper>
             </div>
             <div className={styles.overlay} />
+
             <div className={styles.content}>
                 <p className={styles.greeting}>{c['hero.label'] || 'Interior Design Studio'}</p>
                 <h1 className={styles.name}>
@@ -32,10 +33,6 @@ export default function HeroSection() {
                 <p className={styles.tagline}>{c['hero.subtitle'] || 'Crafting bespoke interiors that blend beauty, function, and soul.'}</p>
                 <Link href="/projects" className={styles.ctaBtn}>{c['hero.cta'] || 'View Projects'}</Link>
             </div>
-            <button className={styles.scrollIndicator} onClick={() => document.getElementById('about-preview')?.scrollIntoView({ behavior: 'smooth' })} aria-label="Scroll down">
-                <span className={styles.scrollText}>Scroll</span>
-                <ChevronDown size={18} className={styles.scrollIcon} />
-            </button>
         </section>
     );
 }

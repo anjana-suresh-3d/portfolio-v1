@@ -1,37 +1,34 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import styles from './InfiniteCarousel.module.css';
 
 export default function InfiniteCarousel({ images, onImageClick }) {
-    // Determine how many times to duplicate the set so it fills the screen width comfortably.
-    // CSS animation uses translate -33.333% to seamlessly loop 3 equal sets.
-    const repeatedImages = [...images, ...images, ...images];
+    const scrollRef = useRef(null);
 
-    // Compute animation duration dynamically. More images = more time, so speed feels constant.
-    const animationDuration = `${Math.max(20, images.length * 6)}s`;
+    const scroll = (direction) => {
+        if (!scrollRef.current) return;
+        const scrollAmount = window.innerWidth < 768 ? 320 : window.innerWidth < 1200 ? 400 : 450;
+        scrollRef.current.scrollBy({
+            left: direction === 'left' ? -scrollAmount : scrollAmount,
+            behavior: 'smooth'
+        });
+    };
 
     return (
         <div className={styles.carouselContainer}>
-            <div
-                className={styles.track}
-                style={{ animationDuration }}
-            >
-                {/* 3 identical sets for perfect infinite scrolling math */}
-                <div className={styles.set}>
-                    {images.map((img, idx) => (
-                        <CarouselSlide key={`set1-${idx}`} img={img} onClick={() => onImageClick && onImageClick(img)} />
-                    ))}
-                </div>
-                <div className={styles.set} aria-hidden="true">
-                    {images.map((img, idx) => (
-                        <CarouselSlide key={`set2-${idx}`} img={img} onClick={() => onImageClick && onImageClick(img)} />
-                    ))}
-                </div>
-                <div className={styles.set} aria-hidden="true">
-                    {images.map((img, idx) => (
-                        <CarouselSlide key={`set3-${idx}`} img={img} onClick={() => onImageClick && onImageClick(img)} />
-                    ))}
-                </div>
+            <button className={`${styles.navBtn} ${styles.prevBtn}`} onClick={() => scroll('left')} aria-label="Previous image">
+                <ChevronLeft size={24} />
+            </button>
+
+            <div className={styles.track} ref={scrollRef}>
+                {images.map((img, idx) => (
+                    <CarouselSlide key={`slide-${idx}`} img={img} onClick={() => onImageClick && onImageClick(img)} />
+                ))}
             </div>
+
+            <button className={`${styles.navBtn} ${styles.nextBtn}`} onClick={() => scroll('right')} aria-label="Next image">
+                <ChevronRight size={24} />
+            </button>
         </div>
     );
 }
@@ -41,7 +38,11 @@ function CarouselSlide({ img, onClick }) {
         <div className={styles.slide} onClick={onClick}>
             <div className={styles.imageWrapper}>
                 <img
-                    src={img.url || img.src || img.image || img.coverImage}
+                    src={
+                        (img.url || img.src || img.image || img.coverImage)?.startsWith('http')
+                            ? `/_next/image?url=${encodeURIComponent(img.url || img.src || img.image || img.coverImage)}&w=1920&q=75`
+                            : (img.url || img.src || img.image || img.coverImage)
+                    }
                     alt={img.alt || img.title || 'Project image'}
                     className={styles.image}
                     loading="lazy"

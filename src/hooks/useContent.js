@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, createContext, useContext } from 'react';
+import CursorShapes from '@/components/ui/CursorShapes';
 
 const ContentContext = createContext({ content: {}, isLoading: true });
 
@@ -20,7 +21,12 @@ export function ContentProvider({ children, initialContent = {} }) {
             });
     }, []);
 
-    return <ContentContext.Provider value={{ content, isLoading }}>{children}</ContentContext.Provider>;
+    return (
+        <ContentContext.Provider value={{ content, isLoading }}>
+            <CursorShapes />
+            {children}
+        </ContentContext.Provider>
+    );
 }
 
 export function useContent() {

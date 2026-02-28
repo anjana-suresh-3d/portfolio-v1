@@ -29,7 +29,11 @@ export default function ImageModal({ isOpen, image, onClose }) {
                 </button>
                 <div className={styles.imageContainer}>
                     <img
-                        src={image.url || image.src || image.image}
+                        src={
+                            (image.url || image.src || image.image)?.startsWith('http')
+                                ? `/_next/image?url=${encodeURIComponent(image.url || image.src || image.image)}&w=1920&q=75`
+                                : (image.url || image.src || image.image)
+                        }
                         alt={image.alt || image.title || 'Project Detail'}
                         className={styles.image}
                     />

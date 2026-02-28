@@ -1,0 +1,46 @@
+.container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 9999;
+    overflow: hidden;
+}
+
+.shape {
+    position: absolute;
+    border: 1px solid var(--color-accent);
+    pointer-events: none;
+    will-change: transform, opacity;
+}
+
+.square {
+    border-radius: 2px;
+}
+
+.circle {
+    border-radius: 50%;
+}
+
+.triangle {
+    width: 0 !important;
+    height: 0 !important;
+    border-left: 25px solid transparent;
+    border-right: 25px solid transparent;
+    border-bottom: 43px solid var(--color-primary);
+    background: none !important;
+    border-top: none !important;
+    border-top-width: 0 !important;
+    border-style: solid;
+    border-color: transparent transparent var(--color-primary) transparent;
+}
+
+/* Redefining triangle for cleaner SVG implementation if CSS borders are messy */
+.triangle {
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    background: var(--color-accent);
+    border: none;
+    opacity: 0.2;
+}

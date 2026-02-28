@@ -9,6 +9,7 @@ import Footer from '@/components/ui/Footer';
 import { ArrowLeft, MapPin, Calendar } from 'lucide-react';
 import InfiniteCarousel from '@/components/ui/InfiniteCarousel';
 import ImageModal from '@/components/ui/ImageModal';
+import ErrorBoundary from '@/components/ui/ErrorBoundary';
 import styles from './detail.module.css';
 
 const ProjectViewer = dynamic(() => import('@/components/three/ProjectViewer'), { ssr: false });
@@ -88,7 +89,11 @@ export default function ProjectDetailPage() {
 
                     <div className={styles.coverWrapper}>
                         {project.coverImage ? (
-                            <img src={project.coverImage} alt={project.title} className={styles.coverImage} />
+                            <img
+                                src={project.coverImage.startsWith('http') ? `/_next/image?url=${encodeURIComponent(project.coverImage)}&w=1920&q=75` : project.coverImage}
+                                alt={project.title}
+                                className={styles.coverImage}
+                            />
                         ) : (
                             <div className={styles.coverPlaceholder}>{project.title.charAt(0)}</div>
                         )}
@@ -104,7 +109,14 @@ export default function ProjectDetailPage() {
                     {project.modelUrl && project.showModel !== false && (
                         <div className={styles.viewerSection}>
                             <h2 className={styles.sectionTitle}>3D Model</h2>
-                            <ProjectViewer modelUrl={project.modelUrl} />
+                            <ErrorBoundary>
+                                <ProjectViewer
+                                    modelUrl={project.modelUrl.startsWith('http')
+                                        ? `/api/proxy-model?url=${encodeURIComponent(project.modelUrl)}`
+                                        : project.modelUrl
+                                    }
+                                />
+                            </ErrorBoundary>
                         </div>
                     )}
 

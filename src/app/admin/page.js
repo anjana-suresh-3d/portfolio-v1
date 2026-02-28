@@ -11,6 +11,7 @@ const CONTENT_SECTIONS = [
         label: 'Global Settings', keys: [
             { key: 'nav.brand', label: 'Brand Name' },
             { key: 'site.loader', label: 'Site Loader (GIF/PNG)', type: 'image' },
+            { key: 'site.favicon', label: 'Site Favicon (.ico/.png)', type: 'image' },
         ]
     },
     {

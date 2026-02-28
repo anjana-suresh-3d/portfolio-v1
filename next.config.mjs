@@ -5,6 +5,18 @@ const nextConfig = {
       bodySizeLimit: '10mb'
     }
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '*.supabase.co',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+      },
+    ],
+  },
   async headers() {
     return [
       {
