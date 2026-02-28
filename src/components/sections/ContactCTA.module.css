@@ -1,0 +1,75 @@
+.section {
+    padding: var(--space-section) 0;
+    background: var(--color-surface);
+    text-align: center;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 var(--space-lg);
+}
+
+.label {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: var(--space-lg);
+}
+
+.heading {
+    font-family: var(--font-heading);
+    font-size: clamp(2rem, 5vw, var(--text-5xl));
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--color-primary);
+    margin-bottom: var(--space-2xl);
+}
+
+.accent {
+    color: var(--color-accent);
+    font-style: italic;
+}
+
+.cta {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-md) var(--space-2xl);
+    background: var(--color-primary);
+    color: var(--color-surface);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border-radius: var(--radius-full);
+    transition: all var(--duration-normal) var(--ease-out);
+    cursor: pointer;
+}
+
+.cta:hover {
+    background: var(--color-accent);
+    color: var(--color-surface);
+    transform: translateY(-2px);
+}
+
+/* Animations */
+.animate {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out);
+}
+
+.animate.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.animate:nth-child(2) {
+    transition-delay: 0.15s;
+}
+
+.animate:nth-child(3) {
+    transition-delay: 0.3s;
+}
