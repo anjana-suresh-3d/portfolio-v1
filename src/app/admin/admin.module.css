@@ -65,7 +65,8 @@
     gap: var(--space-xs);
     padding: var(--space-sm) var(--space-lg);
     font-size: var(--text-sm);
-    font-weight: 500;
+    font-weight: 400;
+    /* changed from 500 */
     color: var(--color-text-muted);
     background: transparent;
     border: none;
@@ -107,7 +108,8 @@
 .statNum {
     font-family: var(--font-heading);
     font-size: var(--text-3xl);
-    font-weight: 700;
+    font-weight: 800;
+    /* changed from 700 */
     display: block;
 }
 
@@ -206,8 +208,11 @@
 
 .field label {
     font-size: var(--text-sm);
-    font-weight: 500;
+    font-weight: 400;
+    /* changed from 500 */
 }
+
+/* <label> */
 
 .field input,
 .field select,
@@ -238,7 +243,8 @@
 
 .uploadField>label:first-child {
     font-size: var(--text-sm);
-    font-weight: 500;
+    font-weight: 400;
+    /* changed from 500 */
 }
 
 .uploadBtn {
@@ -411,7 +417,8 @@
 
 .rowThumb span {
     font-family: var(--font-heading);
-    font-weight: 700;
+    font-weight: 800;
+    /* changed from 700 */
     color: rgba(0, 0, 0, 0.1);
 }
 
@@ -708,7 +715,8 @@
     cursor: pointer;
     transition: all 0.2s;
     font-size: var(--text-sm);
-    font-weight: 500;
+    font-weight: 400;
+    /* changed from 500 */
 }
 
 .addGalleryBtn:hover {

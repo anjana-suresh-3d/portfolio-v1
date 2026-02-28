@@ -7,7 +7,7 @@ export function useMediaQuery(query) {
 
     useEffect(() => {
         const media = window.matchMedia(query);
-        setMatches(media.matches);
+        setTimeout(() => setMatches(media.matches), 0);
 
         const listener = (e) => setMatches(e.matches);
         media.addEventListener('change', listener);

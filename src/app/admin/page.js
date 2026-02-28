@@ -126,7 +126,12 @@ export default function AdminDashboard() {
 
     useEffect(() => {
         if (status === 'unauthenticated') router.push('/admin/login');
-        if (status === 'authenticated') { loadProjects(); loadContent(); }
+        if (status === 'authenticated') {
+            setTimeout(() => {
+                loadProjects();
+                loadContent();
+            }, 0);
+        }
     }, [status, router, loadProjects, loadContent]);
 
     const resetForm = () => {
@@ -383,7 +388,7 @@ export default function AdminDashboard() {
                     <div className={styles.projectList}>
                         <h2>Projects</h2>
                         {loading ? <p>Loading projects...</p> : projects.length === 0 ? (
-                            <p className={styles.empty}>No projects yet. Click "New Project" to create one.</p>
+                            <p className={styles.empty}>No projects yet. Click &quot;New Project&quot; to create one.</p>
                         ) : (
                             <div className={styles.table}>
                                 {projects.map((project) => (

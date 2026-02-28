@@ -47,7 +47,7 @@ function ContactPageContent() {
                             {c['contact.heading'] || "Let's bring your vision to life."}
                         </h1>
                         <p className={styles.desc}>
-                            {c['contact.description'] || "Whether you're planning a renovation, building from scratch, or simply looking for design guidance — I'd love to hear about your project."}
+                            {c['contact.description'] || "Whether you're planning a renovation, building from scratch, or simply looking for design guidance — I&apos;d love to hear about your project."}
                         </p>
                         <div className={styles.details}>
                             <div className={styles.detail}>
@@ -68,7 +68,7 @@ function ContactPageContent() {
                             <div className={styles.success}>
                                 <CheckCircle size={40} />
                                 <h3>Message sent!</h3>
-                                <p>Thank you for reaching out. I'll get back to you soon.</p>
+                                <p>Thank you for reaching out. I&apos;ll get back to you soon.</p>
                                 <button type="button" className={styles.resetBtn} onClick={() => setStatus('idle')}>
                                     Send another message
                                 </button>
