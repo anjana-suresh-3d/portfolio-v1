@@ -1,6 +1,14 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin, STORAGE_BUCKET, getSignedUrl } from '@/lib/supabase';
 
+// Disallow body parsing to handle raw stream and increase size limits for Vercel
+export const config = {
+    api: {
+        bodyParser: false,
+        sizeLimit: '10mb',
+    },
+};
+
 export async function POST(request) {
     try {
         const formData = await request.formData();
