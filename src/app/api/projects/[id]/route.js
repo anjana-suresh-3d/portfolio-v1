@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getSignedUrl } from '@/lib/supabase';
+import { getSignedUrl, getProxiedUrl, stripProxy } from '@/lib/supabase';
 
 // Helper to sign URLs in project data
 async function signProjectAssets(project) {
@@ -9,20 +9,34 @@ async function signProjectAssets(project) {
     // Use a long expiry for performance (e.g., 24 hours)
     const expiry = 24 * 3600;
 
-    if (project.coverImage && !project.coverImage.startsWith('http')) {
-        project.coverImage = await getSignedUrl(project.coverImage, expiry) || project.coverImage;
+    if (project.coverImage) {
+        if (!project.coverImage.startsWith('http')) {
+            const signed = await getSignedUrl(project.coverImage, expiry);
+            project.coverImage = getProxiedUrl(signed) || project.coverImage;
+        } else {
+            project.coverImage = getProxiedUrl(project.coverImage);
+        }
     }
 
-    if (project.modelUrl && !project.modelUrl.startsWith('http')) {
-        project.modelUrl = await getSignedUrl(project.modelUrl, expiry) || project.modelUrl;
+    if (project.modelUrl) {
+        if (!project.modelUrl.startsWith('http')) {
+            const signed = await getSignedUrl(project.modelUrl, expiry);
+            project.modelUrl = getProxiedUrl(signed) || project.modelUrl;
+        } else {
+            project.modelUrl = getProxiedUrl(project.modelUrl);
+        }
     }
 
     if (project.images && Array.isArray(project.images)) {
         project.images = await Promise.all(
             project.images.map(async (img) => {
-                if (img.url && !img.url.startsWith('http')) {
-                    const signed = await getSignedUrl(img.url, expiry);
-                    return { ...img, url: signed || img.url };
+                if (img.url) {
+                    if (!img.url.startsWith('http')) {
+                        const signed = await getSignedUrl(img.url, expiry);
+                        return { ...img, url: getProxiedUrl(signed) || img.url };
+                    } else {
+                        return { ...img, url: getProxiedUrl(img.url) };
+                    }
                 }
                 return img;
             })
@@ -30,6 +44,20 @@ async function signProjectAssets(project) {
     }
 
     return project;
+}
+
+// Helper to clean incoming data
+function cleanProjectAssets(data) {
+    if (!data) return data;
+    if (data.coverImage) data.coverImage = stripProxy(data.coverImage);
+    if (data.modelUrl) data.modelUrl = stripProxy(data.modelUrl);
+    if (data.images && Array.isArray(data.images)) {
+        data.images = data.images.map(img => ({
+            ...img,
+            url: stripProxy(img.url)
+        }));
+    }
+    return data;
 }
 
 export async function GET(request, { params }) {
@@ -56,7 +84,8 @@ export async function PUT(request, { params }) {
     try {
         const { id } = await params;
         const body = await request.json();
-        const { title, description, category, year, location, featured, published, coverImage, modelUrl, showModel, images } = body;
+        const cleanedBody = cleanProjectAssets(body);
+        const { title, description, category, year, location, featured, published, coverImage, modelUrl, showModel, images } = cleanedBody;
 
         const updateData = {};
         if (title !== undefined) {

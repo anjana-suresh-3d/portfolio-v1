@@ -90,7 +90,7 @@ export default function ProjectDetailPage() {
                     <div className={styles.coverWrapper}>
                         {project.coverImage ? (
                             <img
-                                src={project.coverImage.startsWith('http') ? `/_next/image?url=${encodeURIComponent(project.coverImage)}&w=1920&q=75` : project.coverImage}
+                                src={project.coverImage}
                                 alt={project.title}
                                 className={styles.coverImage}
                             />
@@ -110,12 +110,7 @@ export default function ProjectDetailPage() {
                         <div className={styles.viewerSection}>
                             <h2 className={styles.sectionTitle}>3D Model</h2>
                             <ErrorBoundary>
-                                <ProjectViewer
-                                    modelUrl={project.modelUrl.startsWith('http')
-                                        ? `/api/proxy-model?url=${encodeURIComponent(project.modelUrl)}`
-                                        : project.modelUrl
-                                    }
-                                />
+                                <ProjectViewer modelUrl={project.modelUrl} />
                             </ErrorBoundary>
                         </div>
                     )}
@@ -130,7 +125,7 @@ export default function ProjectDetailPage() {
                         </div>
                     )}
                 </div>
-            </main>
+            </main >
             <Footer />
 
             <ImageModal

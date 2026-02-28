@@ -1,7 +1,7 @@
 import { Archivo, Space_Grotesk } from 'next/font/google';
 import '@/styles/globals.css';
 import prisma from '@/lib/prisma';
-import { getSignedUrl } from '@/lib/supabase';
+import { getSignedUrl, getProxiedUrl, stripProxy } from '@/lib/supabase';
 
 const archivo = Archivo({
   subsets: ['latin'],
@@ -24,12 +24,14 @@ export async function generateMetadata() {
 
   let faviconUrl = '/favicon.ico'; // Default
   if (faviconEntry?.value) {
+    const cleanValue = stripProxy(faviconEntry.value);
+
     // If it's a Supabase path (doesn't start with http/https)
-    if (!faviconEntry.value.startsWith('http')) {
-      const signed = await getSignedUrl(faviconEntry.value, 604800); // 7 days
-      if (signed) faviconUrl = signed;
+    if (!cleanValue.startsWith('http')) {
+      const signed = await getSignedUrl(cleanValue, 604800); // 7 days
+      faviconUrl = getProxiedUrl(signed) || faviconUrl;
     } else {
-      faviconUrl = faviconEntry.value;
+      faviconUrl = getProxiedUrl(cleanValue);
     }
   }
 

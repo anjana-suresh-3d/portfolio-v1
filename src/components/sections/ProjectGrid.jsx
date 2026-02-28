@@ -62,7 +62,7 @@ export default function ProjectGrid() {
                         <div className={styles.imageWrapper}>
                             {project.coverImage ? (
                                 <img
-                                    src={project.coverImage.startsWith('http') ? `/_next/image?url=${encodeURIComponent(project.coverImage)}&w=1920&q=75` : project.coverImage}
+                                    src={project.coverImage}
                                     alt={project.title}
                                     className={styles.image}
                                 />

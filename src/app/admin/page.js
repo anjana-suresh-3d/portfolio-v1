@@ -97,6 +97,9 @@ export default function AdminDashboard() {
         images: [], // Gallery images [{url: path, alt: '', description: ''}]
     });
 
+    // Tracking the current upload context for fallbacks
+    const [lastUploadMeta, setLastUploadMeta] = useState({ field: '', isGallery: false, isContent: false });
+
     // Temp previews for newly uploaded assets
     const [previews, setPreviews] = useState({});
 
@@ -146,6 +149,8 @@ export default function AdminDashboard() {
         const file = e.target.files?.[0];
         if (!file) return;
         setUploading(true);
+        const context = { field, isGallery, isContent };
+        setLastUploadMeta(context); // Also keep for logging/diagnostics
 
         try {
             // 1. Get Signed Upload URL from our secure backend
@@ -162,7 +167,7 @@ export default function AdminDashboard() {
                 return;
             }
 
-            // 2. Upload file directly from browser -> Supabase Storage (Bypasses Vercel 4.5MB limits/ISP DNS issues)
+            // 2. Upload file directly from browser -> Supabase Storage
             const uploadRes = await fetch(tokenData.uploadUrl, {
                 method: 'PUT',
                 body: file,
@@ -174,26 +179,58 @@ export default function AdminDashboard() {
 
             if (uploadRes.ok) {
                 const localPreview = URL.createObjectURL(file);
-                if (isGallery) {
-                    setForm(prev => ({
-                        ...prev,
-                        images: [...prev.images, { url: tokenData.path, alt: '', description: '' }]
-                    }));
-                    setPreviews(prev => ({ ...prev, [tokenData.path]: localPreview }));
-                } else if (isContent) {
-                    setContent(prev => ({ ...prev, [field]: localPreview }));
-                } else {
-                    setForm((prev) => ({ ...prev, [field]: tokenData.path }));
-                    setPreviews(prev => ({ ...prev, [field]: localPreview }));
-                }
+                const finalPreview = tokenData.previewUrl || localPreview;
+                updateFormAndPreview(tokenData.path, finalPreview, context);
             } else {
-                alert('Direct upload to storage failed. Status: ' + uploadRes.status);
+                console.log('Direct upload failed, trying server-side fallback...');
+                await performServerSideUpload(file, context);
             }
         } catch (err) {
-            console.error('Upload failed:', err);
-            alert('Network error during upload');
+            console.warn('Direct upload network error, trying server-side fallback...', err);
+            await performServerSideUpload(file, context);
         }
         setUploading(false);
+    };
+
+    const performServerSideUpload = async (file, context) => {
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const res = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData,
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                const localPreview = URL.createObjectURL(file);
+                updateFormAndPreview(data.path, localPreview, context);
+            } else {
+                alert(`Upload failed: ${data.error || 'Server error'}`);
+            }
+        } catch (err) {
+            console.error('Server fallback failed:', err);
+            alert('Upload failed: Constant network issues.');
+        }
+    };
+
+    const updateFormAndPreview = (path, preview, context) => {
+        const { field, isGallery, isContent } = context;
+
+        if (isGallery) {
+            setForm(prev => ({
+                ...prev,
+                images: [...prev.images, { url: path, alt: '', description: '' }]
+            }));
+            setPreviews(prev => ({ ...prev, [path]: preview }));
+        } else if (isContent) {
+            setContent(prev => ({ ...prev, [field]: path }));
+            setPreviews(prev => ({ ...prev, [path]: preview }));
+        } else {
+            setForm((prev) => ({ ...prev, [field]: path }));
+            setPreviews(prev => ({ ...prev, [path]: preview }));
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -350,13 +387,25 @@ export default function AdminDashboard() {
                                     <div className={styles.formGrid}>
                                         <div className={styles.uploadField}>
                                             <label>Cover Image</label>
-                                            {(previews.coverImage || form.coverImage) && <img src={previews.coverImage || form.coverImage} alt="Cover" className={styles.preview} />}
+                                            {(previews[form.coverImage] || form.coverImage) && (
+                                                <img
+                                                    src={previews[form.coverImage] || form.coverImage}
+                                                    alt="Cover"
+                                                    className={styles.preview}
+                                                />
+                                            )}
                                             <label className={styles.uploadBtn}><Upload size={14} /> {uploading ? 'Uploading...' : 'Upload Image'}<input type="file" accept="image/*" onChange={(e) => handleUpload(e, 'coverImage')} hidden /></label>
                                         </div>
                                         <div className={styles.uploadField}>
                                             <label>3D Model (.glb)</label>
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                                {form.modelUrl && <span className={styles.fileName}>{form.modelUrl.split('/').pop()}</span>}
+                                                {form.modelUrl && (
+                                                    <span className={styles.fileName}>
+                                                        {form.modelUrl.includes('url=')
+                                                            ? decodeURIComponent(form.modelUrl.split('url=')[1]).split('/').pop().split('?')[0]
+                                                            : form.modelUrl.split('/').pop()}
+                                                    </span>
+                                                )}
                                                 <label className={styles.uploadBtn}><Upload size={14} /> {uploading ? 'Uploading...' : (form.modelUrl ? 'Replace Model' : 'Upload Model')}<input type="file" accept=".glb,.gltf" onChange={(e) => handleUpload(e, 'modelUrl')} hidden /></label>
                                             </div>
                                             {form.modelUrl && (
@@ -458,7 +507,9 @@ export default function AdminDashboard() {
                                                     <textarea rows={3} value={content[key] || ''} onChange={(e) => setContent({ ...content, [key]: e.target.value })} />
                                                 ) : type === 'image' ? (
                                                     <div className={styles.contentUpload}>
-                                                        {content[key] && <img src={content[key]} alt="" className={styles.contentPreview} />}
+                                                        {(previews[content[key]] || content[key]) && (
+                                                            <img src={previews[content[key]] || content[key]} alt="" className={styles.contentPreview} />
+                                                        )}
                                                         <label className={styles.uploadBtn}>
                                                             <Upload size={14} /> {uploading ? 'Uploading...' : 'Change Asset'}
                                                             <input type="file" accept="image/*" onChange={(e) => handleUpload(e, key, false, true)} hidden />
