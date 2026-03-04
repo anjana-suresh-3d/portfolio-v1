@@ -1,75 +1,134 @@
 .section {
-    padding: var(--space-section) 0;
-    background: var(--color-surface);
-    text-align: center;
+    padding: var(--space-2xl) var(--space-sm) 0 var(--space-sm);
+    background: var(--bg-color);
+    position: relative;
+    z-index: 10;
+    min-height: 80vh;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    overflow: hidden;
 }
 
 .container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 0 var(--space-lg);
+    width: 100%;
+    max-width: 2000px;
+    height: 100%;
+    min-height: 70vh;
+    background: var(--text-primary);
+    color: var(--bg-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: var(--space-3xl) var(--space-xl);
+    transform-origin: bottom center;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-lg);
 }
 
 .label {
-    font-size: var(--text-sm);
-    color: var(--color-text-muted);
-    letter-spacing: 0.1em;
+    font-size: 14px;
     text-transform: uppercase;
-    margin-bottom: var(--space-lg);
+    letter-spacing: 0.2em;
+    color: rgba(0, 0, 0, 0.5);
+}
+
+@media (prefers-color-scheme: light) {
+    .label {
+        color: rgba(255, 255, 255, 0.7);
+    }
 }
 
 .heading {
     font-family: var(--font-heading);
-    font-size: clamp(2rem, 5vw, var(--text-5xl));
-    font-weight: 600;
-    line-height: 1.2;
-    color: var(--color-primary);
-    margin-bottom: var(--space-2xl);
+    font-size: clamp(3rem, 8vw, 8rem);
+    font-weight: 400;
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    max-width: 1200px;
 }
 
-.accent {
-    color: var(--color-accent);
-    font-style: italic;
+.btnWrapper {
+    margin-top: var(--space-2xl);
 }
 
 .cta {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: var(--space-sm);
-    padding: var(--space-md) var(--space-2xl);
-    background: var(--color-primary);
-    color: var(--color-surface);
-    font-size: var(--text-sm);
+    gap: var(--space-md);
+    padding: 24px 50px;
+    background: var(--bg-color);
+    color: var(--text-primary);
+    font-family: var(--font-body);
     font-weight: 600;
-    letter-spacing: 0.05em;
     text-transform: uppercase;
-    border-radius: var(--radius-full);
-    transition: all var(--duration-normal) var(--ease-out);
-    cursor: pointer;
+    letter-spacing: 0.15em;
+    font-size: 13px;
+    border-radius: 100px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.5s var(--ease-cinematic);
+    pointer-events: auto;
+    border: 1px solid transparent;
+}
+
+.cta span {
+    position: relative;
+    z-index: 2;
+}
+
+.ctaIcon {
+    position: relative;
+    z-index: 2;
+    transition: transform 0.5s var(--ease-cinematic);
+}
+
+.cta::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--text-primary);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.6s var(--ease-cinematic);
+    z-index: 1;
 }
 
 .cta:hover {
-    background: var(--color-accent);
-    color: var(--color-surface);
-    transform: translateY(-2px);
+    color: var(--bg-color);
+    border-color: var(--text-primary);
 }
 
-/* Animations */
-.animate {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out);
+.cta:hover::before {
+    transform: scaleX(1);
+    transform-origin: left;
 }
 
-.animate.visible {
-    opacity: 1;
-    transform: translateY(0);
+.cta:hover .ctaIcon {
+    transform: translateX(8px);
 }
 
-.animate:nth-child(2) {
-    transition-delay: 0.15s;
-}
+@media (max-width: 768px) {
+    .section {
+        padding: var(--space-xl) var(--space-xs) 0 var(--space-xs);
+        min-height: 60vh;
+    }
 
-.animate:nth-child(3) {
-    transition-delay: 0.3s;
+    .container {
+        min-height: 50vh;
+        padding: var(--space-xl) var(--space-md);
+    }
+
+    .btnWrapper {
+        margin-top: var(--space-xl);
+    }
 }

@@ -1,183 +1,136 @@
 'use client';
 
-import { useRef, useMemo } from 'react';
+import { useRef, useState, Suspense } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { RoundedBox, MeshReflectorMaterial } from '@react-three/drei';
+import { Environment, ContactShadows, Bvh, AdaptiveEvents } from '@react-three/drei';
 import * as THREE from 'three';
-import Lighting from './Lighting';
-import ParticleField from './ParticleField';
-import FloatingElements from './FloatingElements';
+import { Model as RoomModel } from './RoomModel';
 
-function Floor() {
-    return (
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
-            <planeGeometry args={[20, 20]} />
-            <MeshReflectorMaterial
-                blur={[300, 100]}
-                resolution={1024}
-                mixBlur={0.8}
-                mixStrength={0.5}
-                roughness={0.9}
-                depthScale={0.5}
-                minDepthThreshold={0.4}
-                maxDepthThreshold={1.2}
-                color="#F8F6F3"
-                metalness={0.1}
-            />
-        </mesh>
-    );
-}
+// Luxurious Warm Architectural Palette
+const colors = {
+    coveLight: '#ffcc88', // Warm LED 3000K
+};
 
-function Pillar({ position, height = 4, radius = 0.3 }) {
-    return (
-        <mesh position={position} castShadow receiveShadow>
-            <cylinderGeometry args={[radius, radius, height, 32]} />
-            <meshStandardMaterial color="#EDE7E0" roughness={0.7} metalness={0.1} />
-        </mesh>
-    );
-}
+// Drastically simplified particles context
+function FloatingWarmDust() {
+    const meshRef = useRef();
 
-function Arch({ position, rotation = [0, 0, 0] }) {
-    return (
-        <group position={position} rotation={rotation}>
-            {/* Left Pillar */}
-            <mesh position={[-1.5, 2, 0]} castShadow receiveShadow>
-                <boxGeometry args={[0.5, 4, 0.5]} />
-                <meshStandardMaterial color="#D8CEC4" roughness={0.8} />
-            </mesh>
-            {/* Right Pillar */}
-            <mesh position={[1.5, 2, 0]} castShadow receiveShadow>
-                <boxGeometry args={[0.5, 4, 0.5]} />
-                <meshStandardMaterial color="#D8CEC4" roughness={0.8} />
-            </mesh>
-            {/* Top Arch */}
-            <mesh position={[0, 4.25, 0]} castShadow receiveShadow>
-                <boxGeometry args={[3.5, 0.5, 0.5]} />
-                <meshStandardMaterial color="#D8CEC4" roughness={0.8} />
-            </mesh>
-        </group>
-    );
-}
-
-function Steps({ position, rotation = [0, 0, 0] }) {
-    return (
-        <group position={position} rotation={rotation}>
-            <mesh position={[0, 0.15, 0]} castShadow receiveShadow>
-                <boxGeometry args={[4, 0.3, 1]} />
-                <meshStandardMaterial color="#EDE7E0" roughness={0.6} />
-            </mesh>
-            <mesh position={[0, 0.45, -0.8]} castShadow receiveShadow>
-                <boxGeometry args={[4, 0.3, 1]} />
-                <meshStandardMaterial color="#D8CEC4" roughness={0.6} />
-            </mesh>
-            <mesh position={[0, 0.75, -1.6]} castShadow receiveShadow>
-                <boxGeometry args={[4, 0.3, 1]} />
-                <meshStandardMaterial color="#C8A27A" roughness={0.4} metalness={0.3} />
-            </mesh>
-        </group>
-    );
-}
-
-function Pedestal({ position, height = 1.5 }) {
-    const objectRef = useRef();
+    const [positions] = useState(() => {
+        const count = 15;
+        const pos = new Float32Array(count * 3);
+        for (let i = 0; i < count; i++) {
+            pos[i * 3] = (Math.random() - 0.5) * 20;
+            pos[i * 3 + 1] = Math.random() * 4 + 1; // Range [1, 5]
+            pos[i * 3 + 2] = (Math.random() - 0.5) * 15;
+        }
+        return pos;
+    });
 
     useFrame((state) => {
-        if (!objectRef.current) return;
-        // Rotating the object
-        objectRef.current.rotation.y += 0.01;
-        objectRef.current.rotation.x += 0.005;
-        // Subtle floating effect
-        objectRef.current.position.y = height + 0.3 + Math.sin(state.clock.elapsedTime * 1.5 + position[0]) * 0.05;
+        if (!meshRef.current) return;
+        meshRef.current.rotation.y = state.clock.elapsedTime * 0.01;
     });
 
     return (
-        <group position={position}>
-            <mesh position={[0, height / 2, 0]} castShadow receiveShadow>
-                <cylinderGeometry args={[0.4, 0.5, height, 32]} />
-                <meshStandardMaterial color="#2B2A28" roughness={0.9} />
-            </mesh>
-            {/* Display Object on Pedestal */}
-            <mesh ref={objectRef} position={[0, height + 0.3, 0]} castShadow>
-                <icosahedronGeometry args={[0.3]} />
-                <meshPhysicalMaterial color="#C46A4A" roughness={0.2} metalness={0.6} clearcoat={1} envMapIntensity={2} />
-            </mesh>
-        </group>
+        <points ref={meshRef}>
+            <bufferGeometry>
+                <bufferAttribute attach="attributes-position" count={15} array={positions} itemSize={3} />
+            </bufferGeometry>
+            <pointsMaterial size={0.1} color={colors.coveLight} transparent opacity={0.4} depthWrite={false} />
+        </points>
     );
 }
 
-function Plant({ position }) {
-    return (
-        <group position={position}>
-            {/* Pot */}
-            <mesh position={[0, 0.15, 0]} castShadow>
-                <cylinderGeometry args={[0.12, 0.1, 0.3, 12]} />
-                <meshStandardMaterial color="#D8CEC4" roughness={0.9} />
-            </mesh>
-            {/* Leaves */}
-            <mesh position={[0, 0.45, 0]}>
-                <sphereGeometry args={[0.2, 12, 12]} />
-                <meshStandardMaterial color="#8A9A8C" roughness={0.6} />
-            </mesh>
-            <mesh position={[0.08, 0.55, 0.05]}>
-                <sphereGeometry args={[0.12, 10, 10]} />
-                <meshStandardMaterial color="#708271" roughness={0.6} />
-            </mesh>
-        </group>
-    );
-}
-
-export default function HeroScene({ mousePosition = { x: 0, y: 0 } }) {
+export default function HeroScene() {
     const groupRef = useRef();
 
-    useFrame((state) => {
-        if (!groupRef.current) return;
-        const targetX = mousePosition.x * 0.15;
-        const targetY = mousePosition.y * 0.05;
+    // We will track scroll position directly in useFrame for smooth 60fps updates
+    // Use smoothed/damped variables to make camera movement buttery smooth
+    const currentCamPos = useRef(new THREE.Vector3(7.0, -2.5, 10.0));
+    const targetCamPos = useRef(new THREE.Vector3(7.0, -2.5, 10.0));
 
-        groupRef.current.rotation.y = THREE.MathUtils.lerp(
-            groupRef.current.rotation.y,
-            targetX,
-            0.02
-        );
-        groupRef.current.rotation.x = THREE.MathUtils.lerp(
-            groupRef.current.rotation.x,
-            targetY,
-            0.02
-        );
+    useFrame((state, delta) => {
+        const mouseX = state.pointer.x || 0;
+        const mouseY = state.pointer.y || 0;
+
+        const scrollY = typeof window !== 'undefined' ? window.scrollY : 0;
+        const maxScroll = typeof window !== 'undefined' ? window.innerHeight : 1000;
+        const scrollProgress = Math.min(scrollY / maxScroll, 1);
+
+        const scrollCamZ = scrollProgress * -4.5;
+
+        targetCamPos.current.x = 7.0 + (mouseX * -1.0);
+        targetCamPos.current.y = -2.5 + (mouseY * 0.4);
+        targetCamPos.current.z = 10.0 + scrollCamZ;
+
+        currentCamPos.current.x = THREE.MathUtils.damp(currentCamPos.current.x, targetCamPos.current.x, 8, delta);
+        currentCamPos.current.y = THREE.MathUtils.damp(currentCamPos.current.y, targetCamPos.current.y, 8, delta);
+        currentCamPos.current.z = THREE.MathUtils.damp(currentCamPos.current.z, targetCamPos.current.z, 8, delta);
+
+        state.camera.position.copy(currentCamPos.current);
+        state.camera.lookAt(-4, 0.5, -5);
+
+        if (groupRef.current) {
+            groupRef.current.rotation.y = THREE.MathUtils.damp(groupRef.current.rotation.y, mouseX * 0.05, 8, delta);
+        }
     });
 
     return (
-        <>
-            <Lighting />
-            <ParticleField count={150} mousePosition={mousePosition} />
-            <FloatingElements mousePosition={mousePosition} />
+        <group>
+            <Environment preset="city" />
+            <ambientLight intensity={0.4} color="#ffe6cc" />
 
-            <group ref={groupRef} position={[0, -1, 0]}>
-                {/* Vast reflective floor */}
-                <Floor />
+            <directionalLight
+                position={[10, 10, 5]}
+                intensity={1.5}
+                color="#ffffff"
+                castShadow
+            />
 
-                {/* Abstract Architectural Composition */}
+            <pointLight position={[0, 2, 2]} intensity={1.5} color={colors.coveLight} distance={20} />
 
-                {/* Center-Left Structure */}
-                <Arch position={[-2.5, 0, -3]} rotation={[0, Math.PI / 6, 0]} />
+            <ContactShadows
+                position={[0, -2, 0]}
+                opacity={0.4}
+                scale={20}
+                blur={2.4}
+                far={4.5}
+                resolution={512}
+                color="#000000"
+            />
 
-                {/* Center-Right Structure (Balancing the scene) */}
-                <Steps position={[3.5, 0, -2]} rotation={[0, -Math.PI / 4, 0]} />
+            <FloatingWarmDust />
 
-                {/* Deep Background Pillars */}
-                <Pillar position={[-5, 2, -6]} height={6} radius={0.4} />
-                <Pillar position={[6, 3, -7]} height={8} radius={0.5} />
-                <Pillar position={[1, 1.5, -5]} height={3} radius={0.2} />
+            <AdaptiveEvents />
+            <group ref={groupRef} position={[0, 0, 0]}>
+                {/* Main Ceiling - Pure White */}
+                <mesh position={[0, 6, -5]}>
+                    <boxGeometry args={[40, 0.1, 40]} />
+                    <meshStandardMaterial color="#ffffff" roughness={0.1} />
+                </mesh>
 
-                {/* Foreground Focus Objects */}
-                <Pedestal position={[-3.5, 0, 1.5]} height={1.2} />
-                <Pedestal position={[4, 0, 0.5]} height={1.8} />
+                {/* Cove / Fall Lighting Effect - Offset to prevent Z-fighting */}
+                <mesh position={[0, 5.95, -5]}>
+                    <boxGeometry args={[36, 0.05, 36]} />
+                    <meshStandardMaterial
+                        color="#ffffff"
+                        emissive="#ffcc88"
+                        emissiveIntensity={1.2}
+                        transparent
+                        opacity={0.6}
+                    />
+                </mesh>
 
-                {/* Scattered minimal plants for organic touch */}
-                <Plant position={[-1, 0, -1.5]} />
-                <Plant position={[5.5, 0, -1]} />
-                <Plant position={[-5, 0, 0]} />
+                {/* Refined warm point lights for subtle 'fall' light */}
+                <pointLight position={[8, 5.5, -5]} intensity={0.8} color="#ffcc88" distance={12} />
+                <pointLight position={[-8, 5.5, -5]} intensity={0.8} color="#ffcc88" distance={12} />
+
+                <Suspense fallback={null}>
+                    <Bvh firstHitOnlyBuffer>
+                        <RoomModel />
+                    </Bvh>
+                </Suspense>
             </group>
-        </>
+        </group>
     );
 }

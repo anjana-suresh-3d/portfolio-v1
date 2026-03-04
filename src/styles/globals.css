@@ -3,27 +3,31 @@
    Style: Sleek Minimal (Black + White + Gold)
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
-
 /* ---- CSS Variables ---- */
 :root {
   /* Colors */
-  --color-primary: #1F1F1F;
-  --color-secondary: #6B655F;
-  --color-accent: #C46A4A;
-  --color-accent-hover: #C8A27A;
-  --color-background: #F8F6F3;
-  --color-surface: #D8CEC4;
-  --color-surface-hover: #EDE7E0;
-  --color-text: #1F1F1F;
-  --color-text-muted: #6B655F;
-  --color-border: #B7AFA6;
-  --color-sage: #8A9A8C;
-  --color-overlay: rgba(43, 42, 40, 0.6);
+  --color-primary: #1C1C1C;
+  --color-secondary: #4A4A4A;
+  --color-accent: #1E5959;
+  --color-accent-hover: #E5A93A;
+  --color-background: #F5F2EB;
+  --color-surface: #EFECE5;
+  --color-surface-hover: #E2DFD8;
+  --color-text: #1C1C1C;
+  --color-text-muted: #595959;
+  --color-border: #D6D2C4;
+  --color-sage: #3A5A40;
+  --color-overlay: rgba(28, 28, 28, 0.6);
+
+  /* Color Cards in Single */
+  --color-card-teal: #1E5959;
+  --color-card-mustard: #E5A93A;
+  --color-card-green: #3A5A40;
+  --color-card-text: #F5F2EB;
 
   /* Typography */
-  --font-heading: 'Archivo', sans-serif;
-  --font-body: 'Space Grotesk', sans-serif;
+  --font-heading: 'Futura', 'Trebuchet MS', Arial, sans-serif;
+  --font-body: 'Futura', 'Trebuchet MS', Arial, sans-serif;
 
   /* Type Scale (1.25 ratio) */
   --text-xs: 0.75rem;

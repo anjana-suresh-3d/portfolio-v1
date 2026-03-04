@@ -1,0 +1,187 @@
+.section {
+    position: relative;
+    height: 600vh;
+    /* Reduced from 1500vh for a faster, tighter 6-step progression */
+    background: var(--color-primary);
+}
+
+.stickyWrapper {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.contentRow {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    /* No max-width here - allow children to reach screen edges */
+    padding: 0 var(--space-lg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.labelRow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-2xl);
+    width: 100%;
+}
+
+.line {
+    width: 30px;
+    height: 1px;
+    background: var(--color-accent);
+    opacity: 0.5;
+}
+
+.label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    white-space: nowrap;
+}
+
+.stepContainer {
+    position: relative;
+    height: 400px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stepItem {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.stepContent {
+    pointer-events: auto;
+    max-width: 800px;
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: var(--space-3xl) var(--space-xl);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.02);
+    /* Transition for smooth scroll */
+    transition: background 0.5s ease, color 0.5s ease;
+}
+
+/* Color Cards in Single Pattern */
+.stepItem:nth-child(1) .stepContent {
+    background: var(--color-card-teal);
+    border-color: transparent;
+}
+
+.stepItem:nth-child(2) .stepContent {
+    background: var(--color-card-mustard);
+    color: var(--color-primary);
+    border-color: transparent;
+}
+
+.stepItem:nth-child(3) .stepContent {
+    background: var(--color-card-green);
+    border-color: transparent;
+}
+
+.stepItem:nth-child(4) .stepContent {
+    background: var(--color-surface);
+    color: var(--color-primary);
+    border-color: transparent;
+}
+
+.stepItem:nth-child(5) .stepContent {
+    background: var(--color-card-teal);
+    border-color: transparent;
+}
+
+.stepItem:nth-child(6) .stepContent {
+    background: var(--color-card-mustard);
+    color: var(--color-primary);
+    border-color: transparent;
+}
+
+/* Adjust Text Colors based on background */
+.stepItem:nth-child(2) .stepTitle,
+.stepItem:nth-child(4) .stepTitle,
+.stepItem:nth-child(6) .stepTitle {
+    color: var(--color-primary);
+}
+
+.stepItem:nth-child(2) .stepDesc,
+.stepItem:nth-child(4) .stepDesc,
+.stepItem:nth-child(6) .stepDesc {
+    color: rgba(28, 28, 28, 0.8);
+}
+
+
+.stepNumber {
+    position: absolute;
+    bottom: -15vh;
+    right: -5vw;
+    font-family: var(--font-heading);
+    font-size: clamp(25rem, 70vw, 60rem);
+    line-height: 1;
+    color: #ffffff;
+    user-select: none;
+    font-weight: 700;
+    z-index: -1;
+    pointer-events: none;
+    white-space: nowrap;
+    text-align: right;
+    /* Subtle glow to separate from 3D slightly if needed */
+    text-shadow: 0 0 100px rgba(0, 0, 0, 0.5);
+}
+
+.stepTitle {
+    font-family: var(--font-heading);
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 300;
+    margin-bottom: var(--space-lg);
+    color: #ffffff;
+    letter-spacing: -0.02em;
+}
+
+.stepDesc {
+    font-size: 18px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.6);
+    max-width: 500px;
+}
+
+@media (max-width: 768px) {
+    .section {
+        height: 350vh;
+    }
+
+    .stepNumber {
+        font-size: 8rem;
+    }
+
+    .stepTitle {
+        font-size: 2rem;
+    }
+}

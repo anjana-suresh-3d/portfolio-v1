@@ -1,21 +1,6 @@
-import { Archivo, Space_Grotesk } from 'next/font/google';
 import '@/styles/globals.css';
 import prisma from '@/lib/prisma';
 import { getSignedUrl, getProxiedUrl, stripProxy } from '@/lib/supabase';
-
-const archivo = Archivo({
-  subsets: ['latin'],
-  variable: '--font-heading',
-  display: 'swap',
-  weight: ['300', '400', '500', '600', '700'],
-});
-
-const spaceGrotesk = Space_Grotesk({
-  subsets: ['latin'],
-  variable: '--font-body',
-  display: 'swap',
-  weight: ['300', '400', '500', '600', '700'],
-});
 
 export async function generateMetadata() {
   const faviconEntry = await prisma.siteContent.findUnique({
@@ -53,13 +38,15 @@ export async function generateMetadata() {
 
 import { ContentProvider } from '@/hooks/useContent';
 import LoadingScreen from '@/components/ui/LoadingScreen';
+import CustomScrollbar from '@/components/ui/CustomScrollbar';
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${archivo.variable} ${spaceGrotesk.variable}`} suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <body>
         <ContentProvider>
           <LoadingScreen />
+          <CustomScrollbar />
           {children}
         </ContentProvider>
       </body>

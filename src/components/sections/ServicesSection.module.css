@@ -1,13 +1,27 @@
-.section {
-    padding: var(--space-section) 0;
+.carouselSection {
+    height: 300vh;
+    /* scroll height, ensures smooth pacing */
     background: var(--color-primary);
-    color: var(--color-surface);
+    position: relative;
+    z-index: 5;
 }
 
-.container {
-    max-width: var(--max-width);
-    margin: 0 auto;
-    padding: 0 var(--space-lg);
+.stickyContainer {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.header {
+    position: absolute;
+    top: var(--space-3xl);
+    left: var(--space-xl);
+    z-index: 10;
 }
 
 .labelRow {
@@ -18,95 +32,166 @@
 }
 
 .line {
-    width: 40px;
+    width: 60px;
     height: 1px;
     background: var(--color-accent);
 }
 
 .label {
-    font-size: var(--text-xs);
+    font-size: 10px;
     font-weight: 600;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.3em;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--color-accent);
 }
 
 .heading {
     font-family: var(--font-heading);
-    font-size: var(--text-4xl);
-    font-weight: 600;
-    margin-bottom: var(--space-3xl);
-    color: var(--color-surface);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 400;
+    color: #ffffff;
+    max-width: 800px;
+    line-height: 1.1;
+    margin: 0;
 }
 
-.grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
+.scrollWindow {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 60vh;
+    margin-top: 15vh;
+}
+
+.carouselContainer {
+    display: flex;
     gap: var(--space-xl);
+    padding: 0 var(--space-xl);
+    padding-left: 30vw;
+    /* Create a staggered starting feel behind the header */
+    width: max-content;
+    will-change: transform;
 }
 
 .card {
-    padding: var(--space-2xl) var(--space-xl);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: var(--radius-lg);
-    transition: all var(--duration-normal) var(--ease-out);
-    cursor: default;
+    width: 35vw;
+    min-width: 300px;
+    max-width: 500px;
+    height: 45vh;
+    min-height: 350px;
+    padding: var(--space-3xl) var(--space-2xl);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    cursor: pointer;
+}
+
+/* Luxurious Architectural Palette */
+/* 1. Deep Slate */
+.card:nth-child(1) {
+    background: rgba(28, 30, 34, 0.4);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 2. Warm Taupe */
+.card:nth-child(2) {
+    background: rgba(56, 52, 48, 0.4);
+}
+
+/* 3. Charcoal / Onyx */
+.card:nth-child(3) {
+    background: rgba(20, 20, 20, 0.5);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* 4. Soft Bronze / Olive */
+.card:nth-child(4) {
+    background: rgba(45, 46, 40, 0.4);
 }
 
 .card:hover {
-    border-color: var(--color-accent);
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    border-color: rgba(255, 255, 255, 0.15);
     background: rgba(255, 255, 255, 0.03);
-    transform: translateY(-4px);
 }
 
-/* <label> */
-
 .iconWrapper {
-    width: 48px;
-    height: 48px;
+    width: 64px;
+    height: 64px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid var(--color-accent);
-    border-radius: var(--radius-md);
-    margin-bottom: var(--space-lg);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    margin-bottom: var(--space-2xl);
     color: var(--color-accent);
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card:hover .iconWrapper {
+    background: var(--color-accent);
+    color: #000000;
+    border-color: var(--color-accent);
+    transform: scale(1.05);
 }
 
 .cardTitle {
     font-family: var(--font-heading);
-    font-size: var(--text-lg);
-    font-weight: 600;
-    margin-bottom: var(--space-sm);
-    color: var(--color-surface);
+    font-size: 28px;
+    font-weight: 400;
+    margin-bottom: var(--space-md);
+    color: #ffffff;
+    letter-spacing: 0.02em;
+    transition: color 0.4s ease;
 }
 
 .cardDesc {
-    font-size: var(--text-sm);
-    line-height: 1.7;
-    color: rgba(255, 255, 255, 0.6);
+    font-size: 16px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 0.02em;
+    transition: color 0.4s ease;
 }
 
-/* Animations */
-.animate {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out);
+.card:hover .cardTitle {
+    color: var(--color-accent);
 }
 
-.animate.visible {
-    opacity: 1;
-    transform: translateY(0);
+.card:hover .cardDesc {
+    color: rgba(255, 255, 255, 0.9);
 }
 
-@media (max-width: 1024px) {
-    .grid {
-        grid-template-columns: repeat(2, 1fr);
+/* responsive */
+@media (max-width: 768px) {
+    .card {
+        width: 80vw;
+        height: auto;
+        padding: var(--space-xl);
     }
-}
 
-@media (max-width: 640px) {
-    .grid {
-        grid-template-columns: 1fr;
+    .carouselSection {
+        height: 250vh;
+        /* Slightly taller for more scroll duration on small screens */
+    }
+
+    .header {
+        top: var(--space-xl);
+        left: var(--space-md);
+    }
+
+    .carouselContainer {
+        padding-left: var(--space-md);
+    }
+
+    .scrollWindow {
+        margin-top: 25vh;
+        /* Push down below the header */
     }
 }
